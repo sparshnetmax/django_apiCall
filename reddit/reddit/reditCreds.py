@@ -6,7 +6,6 @@ testapp2={'cid' : 'TSdf18VQt_wT-g'}
 password = 'Spnetmax33'
 username = 'sparsh3333'
 
-session = Session()
 session.verify = "certfile.pem"
 reddit = praw.Reddit(client_id=testapp1['cid'],
                      client_secret=testapp1['Csecret'],
