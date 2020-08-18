@@ -1,6 +1,17 @@
-NarrativeI want to be able to Authenticate via OAuth on Reddit. I have an app that I'm creating and I need this functionality to make it easy for my user(s) to login by just giving my app permission to authenticate with Reddit (attaching screenshot).
-After authentication, I want to be able to keep the session valid (token refresh) since there will be actions being done for the user even when they're not logged in (for example scheduling a post). Of course the user also needs a valid auth session when they're performing actions from my app and posting to Reddit.
-Currently, users can perform all actions but I’m using the application type script in order to connect with Reddit. This means I’m asking users to login credentials, secret code and etc to use my app. The idea is to convert from script type authentication to application type using OAuth. This conversion / integration will be done by me.
+NarrativeI want to be able to Authenticate via OAuth on Reddit.
+I have an app that I'm creating and I need this functionality to make it easy for my user(s)
+to login by just giving my app permission to authenticate with Reddit (attaching screenshot).
+After authentication, I want to be able to keep the session valid (token refresh) since there
+will be actions being done for the user even when they're not logged in (for example scheduling
+a post). Of course the user also needs a valid auth session when they're performing actions
+from my app and posting to Reddit.
+
+Currently, users can perform all actions but I’m using the application type script in order
+to connect with Reddit. This means I’m asking users to login credentials, secret code and etc
+to use my app. The idea is to convert from script type authentication to application type
+using OAuth. This conversion / integration will be done by me.
+
+
 Assumptions
 - This needs to be done in Django
 - This is a stand alone app, I will integrate this solution to my current app
@@ -15,8 +26,10 @@ Scope
 - Only users that have granted permission to use Reddit OAuth through my app will be allowed to use it
 - User session should be refreshed while using app
 - User session should persist throughout app
-- Session needs to be maintained if scheduled actions are performed when user is away, for example a schedule post
-- User information should be available within Django Admin. Good to know which users have signed up and which are active (meaning OAuth with reddit is currently active)
+- Session needs to be maintained if scheduled actions are performed when user is away, for example a
+ schedule post
+- User information should be available within Django Admin. Good to know which users have signed up and
+ which are active (meaning OAuth with reddit is currently active)
 - If users has revoked access to Reddit OAuth, then their access with my app is also revoked
 Testing
 - Ability to print out Reddit user attributes after they’re authenticated
