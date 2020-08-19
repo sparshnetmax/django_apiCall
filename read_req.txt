@@ -1,3 +1,6 @@
+https://praw.readthedocs.io/en/latest/getting_started/authentication.html#code-flow
+
+
 NarrativeI want to be able to Authenticate via OAuth on Reddit.
 I have an app that I'm creating and I need this functionality to make it easy for my user(s)
 to login by just giving my app permission to authenticate with Reddit (attaching screenshot).
