@@ -10,8 +10,6 @@ testapp2 = {'cid': 'zGA-aW1QSCPewg',
             'user_agent':"script by /u/sparsh3333",
             'redirectURI':'http://127.0.0.1:8000/redirect'}
 testapp1=testapp2
-
-
 reddit_for_auth = praw.Reddit(client_id=testapp1['cid'],
                      client_secret=testapp1['Csecret'],
                      user_agent=testapp1['user_agent'],
@@ -25,7 +23,6 @@ def ref_token(token):
                      refresh_token=token)
     try:
         answer= reddit_for_Refresh.auth.scopes()
-        token = reddit_for_Refresh.auth
     except:
         answer= reddit_for_Refresh.read_only
     return answer

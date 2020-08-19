@@ -37,10 +37,16 @@ def CreateRefToken(code,reddit):
 
 def newAccessToken(request):
     token = request.session['reddit_reftoken']
-    info = ref_token(token)
+    info,reddit = ref_token(token)
     return HttpResponse(info)
+
     # return JsonResponse ({'token':newToken})
 
 def exitFuction():
     Session.objects.all().delete()
     return redirect('/')
+def userinfo(request):
+    token = request.session['reddit_reftoken']
+    info = reddit_for_auth.user.karma()
+    print(info.values())
+    return HttpResponse(info)

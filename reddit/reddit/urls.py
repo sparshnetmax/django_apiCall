@@ -24,4 +24,5 @@ urlpatterns = [
     path('newToken',views.newAccessToken),
     path('exit',views.exitFuction),
     path('auth/', include('redit_auth.urls')),
+    path('userinfo',views.userinfo)
 ]
