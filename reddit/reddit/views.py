@@ -1,30 +1,46 @@
 from django.shortcuts import redirect,render,HttpResponse
 from django.http.response import JsonResponse
 import json
+from django.template import RequestContext
 from .reditCreds import *
+from django.contrib.sessions.models import Session
+
 
 def redirectUri(request):
     code = request.GET['code']
     print(code)
-    data = CreateRefToken(code,request.session['reddit_creds'])
+    data = CreateRefToken(code,reddit_for_auth)
     data=dict(data)
-    return JsonResponse(data)
+    request.session['reddit_reftoken'] = data['code']
+    request.session['acc_token'] = code
+    return redirect('/')
 
 def index(request):
-    return render(request, 'index.html')
+    try:
+        r_check= render(request, 'index.html')
+        r_check.set_cookie('refreshToken',str(request.session['reddit_reftoken']))
+        return JsonResponse({'accessToken':request.session['acc_token'],
+                             'refreshToken':request.session['reddit_reftoken'],})
 
-def signIn(request):
-    url,reddit = makeURL()
+    except:
+        return render(request, 'index.html')
+def makeURL(request):
+    url = reddit_for_auth.auth.url(["identity"], "permanent")
+
     request.session['redir_url'] = url
-    request.session['reddit_creds'] = reddit
-def makeURL():
-    reddit = praw.Reddit(client_id=testapp1['cid'],
-                         client_secret=testapp1['Csecret'],
-                         user_agent=testapp1['user_agent'],
-                         redirect_uri=testapp1['redirectURI'])
-    url = (reddit.auth.url(["identity"], "permanent"))
-    return url,reddit
+    return redirect(request.session['redir_url'])
 def CreateRefToken(code,reddit):
     code = reddit.auth.authorize(code)
     data = {'code':code}
     return data
+
+
+def newAccessToken(request):
+    token = request.session['reddit_reftoken']
+    info = ref_token(token)
+    return HttpResponse(info)
+    # return JsonResponse ({'token':newToken})
+
+def exitFuction():
+    Session.objects.all().delete()
+    return redirect('/')

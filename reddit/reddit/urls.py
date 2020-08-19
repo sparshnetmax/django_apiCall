@@ -18,7 +18,10 @@ from django.urls import path,include
 from . import views
 urlpatterns = [
     path('', views.index),
-    path('admin/', admin.site.urls),
+    path('admin', admin.site.urls),
     path('redirect', views.redirectUri),
-
+    path('makeurl',views.makeURL),
+    path('newToken',views.newAccessToken),
+    path('exit',views.exitFuction),
+    path('auth/', include('redit_auth.urls')),
 ]
