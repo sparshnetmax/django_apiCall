@@ -22,7 +22,7 @@ urlpatterns = [
     path('redirect', views.redirectUri),
     path('authenticate',views.makeURL),
     path('newToken',views.newAccessToken),
-    path('/exit',views.exitFuction),
+    path('exit',views.exitFuction),
     path('auth/', include('redit_auth.urls')),
     path('userinfo',views.userinfo)
 ]

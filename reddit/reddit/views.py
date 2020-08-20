@@ -32,6 +32,9 @@ def redirectUri(request):
     data=dict(data)
     request.session['reddit_reftoken'] = data['code']
     request.session['acc_token'] = code
+    user = User.objects.get(id=request.session['id'])
+    user.refreshToken = data['code']
+    user.save()
     request.session['AppUser'] =str(data['user'])
     return redirect('/')
 
@@ -57,22 +60,26 @@ def makeURL(request):
         uname=request.GET['username']
         password=request.GET['password']
         try:
-            user1 = User.objects.get(username='sparsh')
+            user1 = User.objects.get(username=uname)
             db_passwrd = user1.password
         except:
             user1 = 0
         if user1 !=0:
             if password == db_passwrd:
                 login=True
+                request.session['user'] = uname
+                request.session['password'] = password
+                request.session['id'] = user1.id
+                request.session['refreshToken'] = user1.refreshToken
             else:
+                print(db_passwrd)
                 return JsonResponse({'ERROR 500 L1': 'Incorrect password'})
         else:
             return JsonResponse({'ERROR 500 L1': 'Username does not exist'})
     except:
         return JsonResponse({'ERROR 500':'LOGIN NEEDED (Please login using your USERNAME and PASSWORD)'})
     url = reddit_for_auth.auth.url(scopes=scope_list, state="permanent")
-    request.session['user'] = uname
-    request.session['password'] = password
+
     request.session['redir_url'] = url
     return redirect(request.session['redir_url'])
 def CreateRefToken(code,reddit):
