@@ -9,11 +9,12 @@
 <h1>Welcome</h1>
 <h3>Index</h3>
 
-{% if  request.session.acc_token or refreshToken%}
+{% if  request.session.acc_token or refreshToken %}
 <p>{{request.session.acc_token}}</p><br>
 <p>{{request.session.reddit_reftoken}}</p>
+<p>{{request.session.user}}</p>
 {% else %}
-<a href="makeurl"><button>sign in</button></a>
+<a href="authenticate"><button>sign in</button></a>
 {% endif %}
 </body>
 </html>

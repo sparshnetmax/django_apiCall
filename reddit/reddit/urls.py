@@ -20,9 +20,9 @@ urlpatterns = [
     path('', views.index),
     path('admin', admin.site.urls),
     path('redirect', views.redirectUri),
-    path('makeurl',views.makeURL),
+    path('authenticate',views.makeURL),
     path('newToken',views.newAccessToken),
-    path('exit',views.exitFuction),
+    path('/exit',views.exitFuction),
     path('auth/', include('redit_auth.urls')),
     path('userinfo',views.userinfo)
 ]
