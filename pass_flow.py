@@ -6,11 +6,10 @@ testapp1 = {'cid': 'zGA-aW1QSCPewg',
 reddit = praw.Reddit(client_id=testapp1['cid'],
                      client_secret=testapp1['Csecret'],
                      user_agent=testapp1['user_agent'],
-refresh_token="606894205423-wZKoU21rdO_l2xx6iFOukUgTF5M",
-                     )
+refresh_token="606894205423-o4Zn7JxHByXuDIQ-FmLDX6c3Rss" )
 
 user_info = dict()
-user_info['name'] = reddit.user.me()
-user_info['karma'] = reddit.user.karma()
-for i,k in user_info.items():
-    print(i,':',k)
+
+content=reddit.user(user_info.get())
+print(content)
+

@@ -6,15 +6,18 @@
 
 </head>
 <body>
-<h1>Welcome</h1>
-<h3>Index</h3>
+
 
 {% if  request.session.acc_token or refreshToken %}
-<p>{{request.session.acc_token}}</p><br>
-<p>{{request.session.reddit_reftoken}}</p>
-<p>{{request.session.user}}</p>
+<h1>Welcome</h1>
+<h3>{{request.session.user}}</h3>
+<p>TOKEN - {{request.session.acc_token}}</p><br>
+<p>REFRESH TOKEN - {{request.session.reddit_reftoken}}</p>
+
+<a href="signout"><button>sign out</button></a>
 {% else %}
 <a href="authenticate"><button>sign in</button></a>
 {% endif %}
+
 </body>
 </html>

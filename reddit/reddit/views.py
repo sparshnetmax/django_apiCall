@@ -7,24 +7,7 @@ from .reditCreds import *
 from django.contrib.sessions.models import Session
 
 User = apps.get_model(app_label='redit_auth',model_name= 'User')
-def checker(token):
-    try:
-        reddit = praw.Reddit(client_id=testapp1['cid'],
-                             client_secret=testapp1['Csecret'],
-                             user_agent=testapp1['user_agent'],
-                             refresh_token=token,
-                             )
-        user_info = dict()
-        user_info['name'] = reddit.user.me()
-        user_info['karma'] = reddit.user.karma()
-        for i, k in user_info.items():
-            print(i, ':', k)
-        print(reddit.user.me())
 
-    except:
-        Session.objects.all().delete()
-        print('SESSION CLEARED')
-        return redirect('/')
 def redirectUri(request):
     code = request.GET['code']
     print(code)
@@ -39,22 +22,16 @@ def redirectUri(request):
     return redirect('/')
 
 def index(request):
+    connection = checker(request)
+    if connection == False:
+        request.session.delete()
+        return redirect('/authenticate')
     try:
-        ref_token_to_use =request.session['reddit_reftoken']
-        print(ref_token_to_use)
-        checker(ref_token_to_use)
+        return JsonResponse({'accessToken': request.session['acc_token'],
+                             'refreshToken': request.session['reddit_reftoken'],
+                             'AppUser': request.session['AppUser']})
     except:
-        pass
-
-    try:
-        # r_check= render(request, 'index.html')
-        # r_check.set_cookie('refreshToken',str(request.session['reddit_reftoken']))
-
-        return JsonResponse({'accessToken':request.session['acc_token'],
-                             'refreshToken':request.session['reddit_reftoken'],
-                             'AppUser':request.session['AppUser']})
-    except:
-        return render(request, 'index.html')
+        return JsonResponse({'ERROR 404':'Invalid login'})
 def makeURL(request):
     try:
         uname=request.GET['username']
@@ -107,3 +84,20 @@ def userinfo(request):
     print(info.values())
 
     return HttpResponse(info)
+
+
+def checker(request):
+    name = False
+    try:
+        user = User.objects.get(id=request.session['id'])
+        ref_token = user.refreshToken
+
+
+        reddit = praw.Reddit(client_id=testapp1['cid'],
+                         client_secret=testapp1['Csecret'],
+                         user_agent=testapp1['user_agent'],
+                         refresh_token=ref_token)
+        name = reddit.user.me()
+        return name
+    except:
+        return name
