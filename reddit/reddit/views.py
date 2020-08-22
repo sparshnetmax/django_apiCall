@@ -1,13 +1,16 @@
 from django.shortcuts import redirect,render,HttpResponse
 from django.http.response import JsonResponse
-import json
-from django.template import RequestContext
 from django.apps import apps
 from .reditCreds import *
 from django.contrib.sessions.models import Session
-User = apps.get_model(app_label='redit_auth',model_name= 'User')
+from django.contrib.sessions.backends.db import SessionStore
 import dicttoxml
 import os
+from django.template import RequestContext
+
+
+User = apps.get_model(app_label='redit_auth',model_name= 'User')
+
 
 def redirectUri(request):
     code = request.GET['code']
@@ -25,8 +28,6 @@ def redirectUri(request):
         user1=User(Appuser=request.session['AppUser'],
                    refreshToken=request.session['reddit_reftoken'])
         user1.save()
-        file1 = open('file1.xml','w')
-        file1.write(dicttoxml.dicttoxml({}))
     return redirect('/')
 
 def index(request):
@@ -36,10 +37,12 @@ def index(request):
         request.session.delete()
         return redirect('/authenticate')
 
+
     result ={'refreshToken': request.session['reddit_reftoken'],'AppUser': request.session['AppUser'],'AccessToken':request.session['AccessToken']}
+    cookie_token =HttpResponse('Cookie')
+    cookie_token.set_cookie('token',str(request.session['reddit_reftoken']),'AppUser',str(request.session['AppUser']))
     writeFile(request,result)
     return JsonResponse(result)
-
 
 def makeURL(request):
     url = reddit_for_auth.auth.url(scopes=scope_list, state="permanent")
@@ -83,8 +86,7 @@ def userPosts(request):
                          client_secret=testapp1['Csecret'],
                          user_agent=testapp1['user_agent'],
                          refresh_token=ref_token)
-    for submission in reddit.subreddit('all').hot(limit=25):
-        print(submission.title)
+
 
 def writeFile(request,result):
     path_to_file = os.path.join(os.getcwd(),'tokens',request.session['AppUser']+'.xml')
