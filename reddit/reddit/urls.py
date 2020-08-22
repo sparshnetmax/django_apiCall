@@ -26,4 +26,5 @@ urlpatterns = [
     path('auth/', include('redit_auth.urls')),
     path('userinfo',views.userinfo),
     path('checker',views.checker),
+    path('writefile',views.writeFile)
 ]

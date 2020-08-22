@@ -1,2 +1,4 @@
 django==3.1.0
 praw==7.1.0
+mysqlclient==2.0.1
+dicttoxml==1.7.4

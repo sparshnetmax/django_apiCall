@@ -79,8 +79,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'redit',
-        'USER':'root',
-        'PASSWORD':'treenety',
+        'USER':'sparsh',
+        'PASSWORD':'sparsh',
         'HOST':'localhost',
         'PORT':'3306',
     }
