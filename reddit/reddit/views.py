@@ -7,7 +7,7 @@ from django.contrib.sessions.backends.db import SessionStore
 import dicttoxml
 import os
 from django.template import RequestContext
-
+from django.core.serializers.json import Serializer
 
 User = apps.get_model(app_label='redit_auth',model_name= 'User')
 
@@ -85,7 +85,8 @@ def userPosts(request):
     reddit = praw.Reddit(client_id=testapp1['cid'],
                          client_secret=testapp1['Csecret'],
                          user_agent=testapp1['user_agent'],
-                         refresh_token=ref_token)
+                         refresh_token=request.session['reddit_reftoken'])
+    allUserPosts = reddit.redditor("sparsh3333").top('all')
 
 
 def writeFile(request,result):
@@ -95,3 +96,49 @@ def writeFile(request,result):
     fil1.write(fW)
     fil1.close()
     print('File Writen at - '+path_to_file)
+
+def show_post(request):
+    connection = checker(request)
+    if connection == False:
+        request.session.delete()
+        return redirect('/authenticate')
+    data_list = list()
+    reddit = praw.Reddit(client_id=testapp1['cid'],
+                         client_secret=testapp1['Csecret'],
+                         user_agent=testapp1['user_agent'],
+                         refresh_token=request.session['reddit_reftoken'],
+                         )
+    allUserPosts = reddit.redditor(request.session['AppUser']).top('all')
+    print(allUserPosts)
+    for i in allUserPosts:
+        print(vars(i))
+        data_list.extend([{'title':i.title, 'text':i.selftext_html, 'author':str(i.author),'id':i.id}])
+    return JsonResponse({'type':'post','data': data_list},safe=False,json_dumps_params=None)
+
+def makePost(request):
+    connection = checker(request)
+    if connection == False:
+        request.session.delete()
+        return redirect('/authenticate')
+    try:
+        img_src=request.GET['img_src']
+    except:
+        # print('Using test image because no image_src in parameter')
+        return JsonResponse({'ERROR':'give a img_src'})
+
+        pass
+    try:
+        title=request.GET['title']
+    except:
+        return JsonResponse({'ERROR':'give a post title'})
+    # try:
+    #     text=request.GET['text']
+    # except:
+    #     return JsonResponse({'ERROR':'give a post text'})
+    reddit = praw.Reddit(client_id=testapp1['cid'],
+                         client_secret=testapp1['Csecret'],
+                         user_agent=testapp1['user_agent'],
+                         refresh_token=request.session['reddit_reftoken'],
+                         )
+    reddit.subreddit("memes").submit(title=title, url=img_src, nsfw=False)
+    return redirect('/')
