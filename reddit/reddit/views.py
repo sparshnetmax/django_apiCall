@@ -84,10 +84,11 @@ def checker(request):
                          client_secret=testapp1['Csecret'],
                          user_agent=testapp1['user_agent'],
                          refresh_token=ref_token)
-        name = reddit.user.me()
+        name =str( reddit.user.me())
+        print('HELLO - ' + name)
         return name
     except:
-        return name
+        return False
 # #FUNTION TO GET USER POSTS FORM REDIT
 # def userPosts(request):
 #     #MAKING REDIT INSTANCE USING EXISTING REFRESH TOKEN
@@ -144,11 +145,10 @@ def makePost(request):
         title=request.GET['title']
     except:
         return JsonResponse({'ERROR':'give a post title'})
-    # try:
-    #     text=request.GET['text']
-    # except:
-    #     return JsonResponse({'ERROR':'give a post text'})
+
     reddit = praw.Reddit(client_id=testapp1['cid'],client_secret=testapp1['Csecret'],
                          user_agent=testapp1['user_agent'],refresh_token=request.session['reddit_reftoken'])
     reddit.subreddit("memes").submit(title=title, url=img_src, nsfw=False)
     return redirect('/')
+
+
