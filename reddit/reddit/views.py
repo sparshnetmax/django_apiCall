@@ -12,12 +12,14 @@ from django.core.serializers.json import Serializer
 User = apps.get_model(app_label='redit_auth',model_name= 'User')
 
 
-def redirectUri(request):
+def redirectUri(request): # The redirct url that is added into developer app .This url gives us the code returned from redit portal
     code = request.GET['code']
     request.session['AccessToken'] = code
     print(code)
-    data = CreateRefToken(code,reddit_for_auth)
+    data = CreateRefToken(code,reddit_for_auth) #Function to get refresh token
     data=dict(data)
+
+                                # MAKING SESSION and Database entries
     request.session['reddit_reftoken'] = data['code']
     request.session['AppUser'] =str(data['user'])
     try:
@@ -28,26 +30,26 @@ def redirectUri(request):
         user1=User(Appuser=request.session['AppUser'],
                    refreshToken=request.session['reddit_reftoken'])
         user1.save()
-    return redirect('/')
+    return redirect('/')        #redirecting to main page after authenticating the session
 
 def index(request):
-    print(os.getcwd())
-    connection = checker(request)
+    #Home Page
+    connection = checker(request)    #Function to check the pemissions of the user
     if connection == False:
         request.session.delete()
-        return redirect('/authenticate')
-
-
+        return redirect('/authenticate')  #If permisiions revoked the user get redirected to main login for new token
     result ={'refreshToken': request.session['reddit_reftoken'],'AppUser': request.session['AppUser'],'AccessToken':request.session['AccessToken']}
     cookie_token =HttpResponse('Cookie')
     cookie_token.set_cookie('token',str(request.session['reddit_reftoken']),'AppUser',str(request.session['AppUser']))
     writeFile(request,result)
-    return JsonResponse(result)
+    return JsonResponse(result)  #Render of page with json respose conating credentials. User info  and token
 
-def makeURL(request):
+def makeURL(request):            #Funtion to call URL for app permissions
     url = reddit_for_auth.auth.url(scopes=scope_list, state="permanent")
     print(url)
-    return redirect(url)
+    return redirect(url)         #Redirected to redit app with client id and secret
+
+#FUNTION TO MAKE REFRESH TOKEN
 def CreateRefToken(code,reddit):
     code = reddit.auth.authorize(code)
     user = reddit.user.me()
@@ -61,14 +63,19 @@ def newAccessToken(request):
     info,reddit = ref_token(token)
     return HttpResponse(info)
 
+#FUNCTION TO KILL THE SESSION
 def exitFuction(request):
     Session.objects.all().delete()
     return redirect('/')
+
+#FUNCTION TO GET USER INFO
 def userinfo(request):
     token = request.session['reddit_reftoken']
     info = reddit_for_auth.user.karma()
     print(info.values())
     return HttpResponse(info)
+
+#FUNCTION TO CHECK THE PERMISIONS OF THE USER
 def checker(request):
     name = False
     try:
@@ -81,14 +88,17 @@ def checker(request):
         return name
     except:
         return name
-def userPosts(request):
-    reddit = praw.Reddit(client_id=testapp1['cid'],
-                         client_secret=testapp1['Csecret'],
-                         user_agent=testapp1['user_agent'],
-                         refresh_token=request.session['reddit_reftoken'])
-    allUserPosts = reddit.redditor("sparsh3333").top('all')
+# #FUNTION TO GET USER POSTS FORM REDIT
+# def userPosts(request):
+#     #MAKING REDIT INSTANCE USING EXISTING REFRESH TOKEN
+#     reddit = praw.Reddit(client_id=testapp1['cid'],
+#                          client_secret=testapp1['Csecret'],
+#                          user_agent=testapp1['user_agent'],
+#                          refresh_token=request.session['reddit_reftoken'])
+#     allUserPosts = reddit.redditor("sparsh3333").top('all')
+#     return HttpResponse(allUserPosts)
 
-
+#FUNTION TO WRITE USER INFO INTO XML FILE
 def writeFile(request,result):
     path_to_file = os.path.join(os.getcwd(),'tokens',request.session['AppUser']+'.xml')
     fW = dicttoxml.dicttoxml(result).decode()
@@ -97,6 +107,8 @@ def writeFile(request,result):
     fil1.close()
     print('File Writen at - '+path_to_file)
 
+
+#FUNTION TO GET USER POSTS FORM REDIT
 def show_post(request):
     connection = checker(request)
     if connection == False:
@@ -115,15 +127,16 @@ def show_post(request):
         data_list.extend([{'title':i.title, 'text':i.selftext_html, 'author':str(i.author),'id':i.id}])
     return JsonResponse({'type':'post','data': data_list},safe=False,json_dumps_params=None)
 
+#FUNTION TO MAKE USER POSTS FORM REDIT
 def makePost(request):
-    connection = checker(request)
+    connection = checker(request)     #CHECKING CONNECTION
     if connection == False:
         request.session.delete()
         return redirect('/authenticate')
-    try:
+    try:                                        #PROVIDE IMAGE AND TITLE IN THE URL
         img_src=request.GET['img_src']
     except:
-        # print('Using test image because no image_src in parameter')
+
         return JsonResponse({'ERROR':'give a img_src'})
 
         pass
@@ -135,10 +148,7 @@ def makePost(request):
     #     text=request.GET['text']
     # except:
     #     return JsonResponse({'ERROR':'give a post text'})
-    reddit = praw.Reddit(client_id=testapp1['cid'],
-                         client_secret=testapp1['Csecret'],
-                         user_agent=testapp1['user_agent'],
-                         refresh_token=request.session['reddit_reftoken'],
-                         )
+    reddit = praw.Reddit(client_id=testapp1['cid'],client_secret=testapp1['Csecret'],
+                         user_agent=testapp1['user_agent'],refresh_token=request.session['reddit_reftoken'])
     reddit.subreddit("memes").submit(title=title, url=img_src, nsfw=False)
     return redirect('/')
