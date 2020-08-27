@@ -33,9 +33,7 @@ import praw
 reddit = praw.Reddit(client_id=testapp1['cid'],
                              client_secret=testapp1['Csecret'],
                              user_agent=testapp1['user_agent'],
-                             refresh_token='606894205423--CwWU3IIfn93bAh3jn5QKQQWltI',
-
-                             )
+                             refresh_token='606894205423--CwWU3IIfn93bAh3jn5QKQQWltI')
 img_src = 'https://cdn.vox-cdn.com/thumbor/kcwYR08QGJ5Srb-Z_VY8bXp01SI=/0x0:1920x1080/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/59245045/hangoutsscreen_3.0.jpg'
 allUserPosts = reddit.redditor("sparsh3333").top('all')
 # print(allUserPosts)

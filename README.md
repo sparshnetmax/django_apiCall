@@ -1,7 +1,16 @@
 "# django_apiCall" 
-
-
 https://praw.readthedocs.io/en/latest/getting_started/authentication.html#code-flow
+                   
+                   
+                   
+                   
+                               ####SUPER ADMIN####
+                               
+   -- username --
+admin123
+   -- password --
+admin123
+
 
 TO START
 - Please start the project with making virtual environment

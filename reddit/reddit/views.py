@@ -9,27 +9,15 @@ import os
 from django.template import RequestContext
 from django.core.serializers.json import Serializer
 
-User = apps.get_model(app_label='redit_auth',model_name= 'User')
-
-
 def redirectUri(request): # The redirct url that is added into developer app .This url gives us the code returned from redit portal
     code = request.GET['code']
     request.session['AccessToken'] = code
     print(code)
     data = CreateRefToken(code,reddit_for_auth) #Function to get refresh token
     data=dict(data)
-
                                 # MAKING SESSION and Database entries
     request.session['reddit_reftoken'] = data['code']
     request.session['AppUser'] =str(data['user'])
-    try:
-        user1=User.objects.get(Appuser=request.session['AppUser'] )
-        user1.refreshToken=request.session['reddit_reftoken']
-        user1.save()
-    except:
-        user1=User(Appuser=request.session['AppUser'],
-                   refreshToken=request.session['reddit_reftoken'])
-        user1.save()
     return redirect('/')        #redirecting to main page after authenticating the session
 
 def index(request):
@@ -41,7 +29,6 @@ def index(request):
     result ={'refreshToken': request.session['reddit_reftoken'],'AppUser': request.session['AppUser'],'AccessToken':request.session['AccessToken']}
     cookie_token =HttpResponse('Cookie')
     cookie_token.set_cookie('token',str(request.session['reddit_reftoken']),'AppUser',str(request.session['AppUser']))
-    writeFile(request,result)
     return JsonResponse(result)  #Render of page with json respose conating credentials. User info  and token
 
 def makeURL(request):            #Funtion to call URL for app permissions
@@ -71,9 +58,19 @@ def exitFuction(request):
 #FUNCTION TO GET USER INFO
 def userinfo(request):
     token = request.session['reddit_reftoken']
-    info = reddit_for_auth.user.karma()
-    print(info.values())
-    return HttpResponse(info)
+    connection = checker(request)  # Function to check the pemissions of the user
+    if connection == False:
+        request.session.delete()
+        return redirect('/authenticate')  # If permisiions revoked the user get redirected to main login for new token
+    reddit = praw.Reddit(client_id=testapp1['cid'],
+                         client_secret=testapp1['Csecret'],
+                         user_agent=testapp1['user_agent'],
+                         refresh_token=token,
+                         )
+    info = {'name':str(reddit.user.me()),'karma':str(reddit.user.karma())}
+
+    print(info.items())
+    return HttpResponse(info.items())
 
 #FUNCTION TO CHECK THE PERMISIONS OF THE USER
 def checker(request):
@@ -100,13 +97,7 @@ def checker(request):
 #     return HttpResponse(allUserPosts)
 
 #FUNTION TO WRITE USER INFO INTO XML FILE
-def writeFile(request,result):
-    path_to_file = os.path.join(os.getcwd(),'tokens',request.session['AppUser']+'.xml')
-    fW = dicttoxml.dicttoxml(result).decode()
-    fil1 = open(path_to_file ,'w')
-    fil1.write(fW)
-    fil1.close()
-    print('File Writen at - '+path_to_file)
+
 
 
 #FUNTION TO GET USER POSTS FORM REDIT

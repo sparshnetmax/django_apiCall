@@ -77,19 +77,9 @@ WSGI_APPLICATION = 'reddit.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': 'redit',
-        # 'USER':'sparsh',
-        # 'PASSWORD':'sparsh',
-        # 'HOST':'localhost',
-        # 'PORT':'3306',
-
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'redit',
-        'USER': 'root',
-        'PASSWORD': 'treenety',
-        'HOST': 'localhost',
-        'PORT': '3306',
+
     }
 }
 
